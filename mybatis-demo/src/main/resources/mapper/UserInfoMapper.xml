@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.amadeus.mybatisdemo.mapper.UserInfoMapperXML">
+    <insert id="insert">
+        insert into user_info (username, `password`, age, gender, phone) values (#{username},#{password},#{age},#{gender},#{phone})
+    </insert>
+    <insert id="insertUserInfoByCondition">
+        insert into user_info
+        <trim suffixOverrides = "," prefix="("  suffix=")">
+            <if test="username != null">
+                username,
+            </if>
+            <if test="password != null">
+                `password`,
+            </if>
+            <if test="age != null">
+                age,
+            </if>
+            <if test="gender != null">
+                gender,
+            </if>
+            <if test="phone != null">
+                phone
+            </if>
+        </trim>
+        values
+        <trim suffixOverrides="," prefix="(" suffix=")">
+            <if test="username != null">
+                #{username},
+            </if>
+            <if test="password != null">
+                #{password},
+            </if>
+            <if test="age != null">
+                #{age},
+            </if>
+            <if test="gender != null">
+                #{gender},
+            </if>
+            <if test="phone != null">
+                #{phone}
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateUsernameById">
+        update user_info set username = #{username} where id = #{id}
+    </update>
+
+    <delete id="delete">
+        delete from user_info where username = #{username}
+    </delete>
+
+
+    <select id="getList" resultType="com.amadeus.mybatisdemo.model.UserInfo">
+        select * from user_info
+    </select>
+
+    <select id="queryAllUser" resultType="com.amadeus.mybatisdemo.model.UserInfo">
+        select id, username, `password`, age, gender, phone, delete_flag, create_time, update_time from user_info
+    </select>
+
+    <select id="selectByAge" resultType="com.amadeus.mybatisdemo.model.UserInfo">
+        select * from user_info where age = #{age}
+    </select>
+
+    <select id="queryById" resultType="com.amadeus.mybatisdemo.model.UserInfo">
+        select * from user_info where id = ${id}
+    </select>
+
+    <select id="queryByUsername" resultType="com.amadeus.mybatisdemo.model.UserInfo">
+        select * from user_info where username = #{username}
+    </select>
+
+    <select id="queryAllSort" resultType="com.amadeus.mybatisdemo.model.UserInfo">
+        select * from user_info order by id ${sort}
+    </select>
+
+    <select id="queryAllUserByLike" resultType="com.amadeus.mybatisdemo.model.UserInfo">
+        select * from user_info where username like concat('%', #{key}, '%')
+    </select>
+
+
+
+</mapper>
