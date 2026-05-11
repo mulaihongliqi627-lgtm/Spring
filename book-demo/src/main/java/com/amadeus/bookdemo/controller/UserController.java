@@ -10,9 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @Slf4j
@@ -20,34 +18,33 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("user")
 public class UserController {
     @Autowired
-    private UserService userService;
+    private  UserService userService;
 
-    @PostMapping("login")
-    public boolean login(String name, String password, HttpSession session){
-//        1.打印日志
-        log.info("用户登录:" +  name);
-//        2.参数校验
+    @RequestMapping(value = "login", method = {RequestMethod.GET, RequestMethod.POST})
+    public Result<String> login(@RequestParam(required = false) String name, 
+                                @RequestParam(required = false) String password, 
+                                HttpSession session){
+        log.info("用户登录 - name: [{}], password: [{}]", name, password);
+        
         if(!StringUtils.hasText(name)
                 || !StringUtils.hasText(password)){
-            log.warn("账号或密码不能为空!");
-            return false;
+            log.warn("账号或密码不能为空! name=[{}], password=[{}]", name, password);
+            return Result.fail("账号或密码不能为空");
         }
 
-        //3.调用service校验参数是否正确
-        return userService.checkPassword(name,password,session);
-    }
-
-    @RequestMapping("getListByPage")
-     public Result<PageResponse<BookInfo>> getListByPage(PageRequest pageRequest, HttpSession session){
-        UserInfo userInfo = (UserInfo) session.getAttribute(Constants.SESSION_USER_KEY);
-        if(userInfo == null || userInfo.getId() <= 0){
-            log.info("用户未登录");
-            return Result.unlogin();
+        try {
+            boolean result = userService.checkPassword(name, password, session);
+            if (result) {
+                log.info("登录成功");
+                return Result.success("登录成功");
+            } else {
+                log.info("登录失败 - 用户名或密码错误");
+                return Result.fail("用户名或密码错误");
+            }
+        } catch (Exception e) {
+            log.error("登录异常", e);
+            return Result.fail("登录异常，请稍后重试");
         }
-        log.info("查询图书列表,pageRequest:{}", pageRequest);
-        PageResponse<BookInfo> response = BookService.getListByPage(pageRequest);
-        return Result.success(response);
-
     }
 
 

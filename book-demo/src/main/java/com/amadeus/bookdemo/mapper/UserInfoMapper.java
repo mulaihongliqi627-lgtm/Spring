@@ -10,6 +10,6 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface UserInfoMapper {
 
-    @Select("select * from user_info where deleteFlag = #{deleteFlag} and userName = #{userName}")
+    @Select("select * from user_info where delete_flag = 0 and user_name = #{userName}")
     UserInfo queryUserInfoByName(String name);
 }

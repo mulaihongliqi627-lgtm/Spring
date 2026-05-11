@@ -14,11 +14,11 @@ import java.util.List;
 public class BookService {
 
     @Autowired
-    private static BookInfoMapper bookInfoMapper;
-    public static PageResponse<BookInfo> getListByPage(PageRequest pageRequest) {
+    private  BookInfoMapper bookInfoMapper;
+    public PageResponse<BookInfo> getListByPage(PageRequest pageRequest) {
         //查询图书总数
         Integer count = bookInfoMapper.count();
-        if (count==0){
+        if (count == 0 || count == null){
             return new PageResponse<>(0);
         }
         //查询当前页的数据
@@ -29,6 +29,10 @@ public class BookService {
         }
         return new PageResponse<>(count,bookInfos);
 
+    }
+
+    public Integer addBook(BookInfo bookInfo){
+        return bookInfoMapper.addBook(bookInfo);
     }
 
     public BookInfo queryById(Integer id){
