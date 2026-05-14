@@ -7,8 +7,6 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.util.Date;
 
-@Setter
-@Getter
 @Data
 public class BookInfo {
     //图书ID

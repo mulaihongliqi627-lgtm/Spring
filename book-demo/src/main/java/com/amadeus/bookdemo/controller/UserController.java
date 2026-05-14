@@ -20,7 +20,8 @@ public class UserController {
     @Autowired
     private  UserService userService;
 
-    @RequestMapping(value = "login", method = {RequestMethod.GET, RequestMethod.POST})
+
+    @RequestMapping ("login")
     public Result<String> login(@RequestParam(required = false) String name, 
                                 @RequestParam(required = false) String password, 
                                 HttpSession session){

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
+@RequestMapping("/book")
 public class BookController {
 
     @Autowired
@@ -33,8 +34,8 @@ public class BookController {
 
 
     //添加图书操作
-    @RequestMapping("/addBook")
-    public String addBook(BookInfo bookInfo){
+    @RequestMapping("addBook")
+    public Result<Void> addBook(BookInfo bookInfo){
         log.info("添加图书,bookInfo:{}", bookInfo);
         //对添加的图书进行参数校验
         if(!StringUtils.hasText(bookInfo.getBookName())
@@ -43,15 +44,14 @@ public class BookController {
                 || bookInfo.getPrice() == null
                 || bookInfo.getCount() == null
                 || bookInfo.getStatus() == null){
-            return "输入参数不合法,请重新校验!";
+            return Result.fail("输入参数不合法");
         }
-        Integer result = bookService.addBook(bookInfo);
         bookService.addBook(bookInfo);
-        return "";
+        return Result.success(null);
     }
 
     @RequestMapping("/updateBook")
-    public String updateBook(BookInfo bookInfo){
+    public Result<Void> updateBook(BookInfo bookInfo){
         log.info("修改图书,bookInfo:{}", bookInfo);
         //输入参数校验
         if(!StringUtils.hasText(bookInfo.getBookName())
@@ -60,44 +60,44 @@ public class BookController {
                 || bookInfo.getPrice() == null
                 || bookInfo.getCount() == null
                 || bookInfo.getStatus() == null){
-            return "输入参数不合法,请重新校验!";
+            return Result.fail("输入参数不合法,请重新校验!");
         }
         try{
             Integer result = bookService.updateBook(bookInfo);
-            return result == 1 ? "" : "修改图书失败";
+            return result == 1 ? Result.success(null) : Result.fail("修改图书失败");
         }catch (Exception e){
             log.error("修改图书异常,e:{}", e);
-            return "修改图书失败";
+            return Result.fail("修改图书失败");
         }
     }
 
     @RequestMapping("/deleteBookById")
-    public String deleteBookById(Integer id){
+    public Result<Void> deleteBookById(Integer id){
         log.info("删除图书,id:{}", id);
         if(id == null || id <= 0){
-            return "输入参数不合法,请重新校验!";
+            return Result.fail("输入参数不合法,请重新校验!");
         }
         try{
             Integer result = bookService.deleteBookById(id);
-            return result == 1 ? "" : "删除图书失败";
+            return result == 1 ? Result.success(null) : Result.fail("删除图书失败");
         }catch (Exception e){
             log.error("删除图书异常,e:{}", e);
-            return "删除图书失败";
+            return Result.fail("删除图书失败");
         }
     }
 
     @RequestMapping("/queryBookById")
-    public BookInfo queryBookById(Integer id){
+    public Result<BookInfo> queryBookById(Integer id){
         log.info("查询图书,id:{}", id);
         if (id == null || id <= 0){
-            return new BookInfo();
+            return Result.fail("输入参数不合法");
         }
         try{
             BookInfo bookInfo = bookService.queryById(id);
-            return bookInfo;
+            return Result.success(bookInfo);
         }catch (Exception e){
             log.error("查询图书异常,e:{}", e);
-            return new BookInfo();
+            return Result.fail("查询图书异常");
         }
 
     }

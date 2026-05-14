@@ -18,7 +18,7 @@ public class BookService {
     public PageResponse<BookInfo> getListByPage(PageRequest pageRequest) {
         //查询图书总数
         Integer count = bookInfoMapper.count();
-        if (count == 0 || count == null){
+        if (count == null || count == 0){
             return new PageResponse<>(0);
         }
         //查询当前页的数据

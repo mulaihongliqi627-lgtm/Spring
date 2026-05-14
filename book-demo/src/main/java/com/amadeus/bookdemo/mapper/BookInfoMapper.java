@@ -20,13 +20,10 @@ public interface BookInfoMapper {
             "values (#{bookName}, #{author}, #{count}, #{price}, #{publish}, #{status})")
     Integer addBook(BookInfo bookInfo);
 
-    @Select("select * from book_info where status<>0 limit #{offest} , #{pageSize}")
+    @Select("select * from book_info where status<>0 limit #{offset} , #{pageSize}")
     List<BookInfo> getListByPage(PageRequest pageRequest);
 
     @Select("select * from book_info where id = #{id} and status<>0")
     BookInfo queryById(Integer id);
 
-    Integer updateBook(BookInfo bookInfo);
-
-    Integer deleteBookById(Integer id);
 }

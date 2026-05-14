@@ -22,7 +22,7 @@ public class Result<T> {
     }
 
 
-    public static <T> Result<T> Success(){
+    public static <T> Result<T> success(){
         return new Result(ResultCode.SUCCESS.getCode(), null,null);
     }
     public static <T> Result<T> success(T data){

@@ -38,71 +38,8 @@
                     <td class="width200">操作</td>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td><input type="checkbox" name="selectBook" value="1" id="selectBook" class="book-select"></td>
-                    <td>1</td>
-                    <td>大秦帝国第一册</td>
-                    <td>我是作者</td>
-                    <td>23</td>
-                    <td>33.00</td>
-                    <td>北京出版社</td>
-                    <td>可借阅</td>
-                    <td>
-                        <div class="op">
-                            <a href="book_update.html?bookId=1">修改</a>
-                            <a href="javascript:void(0)" onclick="deleteBook(1)">删除</a>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox" name="selectBook" value="1" id="selectBook" class="book-select"></td>
-                    <td>2</td>
-                    <td>大秦帝国第二册</td>
-                    <td>我是作者</td>
-                    <td>23</td>
-                    <td>33.00</td>
-                    <td>北京出版社</td>
-                    <td>可借阅</td>
-                    <td>
-                        <div class="op">
-                            <a href="book_update.html?bookId=2">修改</a>
-                            <a href="javascript:void(0)" onclick="deleteBook(2)">删除</a>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox" name="selectBook" value="1" id="selectBook" class="book-select"></td>
-                    <td>3</td>
-                    <td>大秦帝国第三册</td>
-                    <td>我是作者</td>
-                    <td>23</td>
-                    <td>33.00</td>
-                    <td>北京出版社</td>
-                    <td>可借阅</td>
-                    <td>
-                        <div class="op">
-                            <a href="book_update.html?bookId=3">修改</a>
-                            <a href="javascript:void(0)" onclick="deleteBook(3)">删除</a>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox" name="selectBook" value="1" id="selectBook" class="book-select"></td>
-                    <td>4</td>
-                    <td>大秦帝国第四册</td>
-                    <td>我是作者</td>
-                    <td>23</td>
-                    <td>33.00</td>
-                    <td>北京出版社</td>
-                    <td>可借阅</td>
-                    <td>
-                        <div class="op">
-                            <a href="book_update.html?bookId=4">修改</a>
-                            <a href="javascript:void(0)" onclick="deleteBook(4)">删除</a>
-                        </div>
-                    </td>
-                </tr>
+            <tbody id="bookTableBody">
+                <!-- 图书数据将通过 JavaScript 动态加载 -->
             </tbody>
         </table>
 
@@ -110,48 +47,143 @@
             <ul id="pageContainer" class="pagination justify-content-center"></ul>
         </div>
         <script>
+            // 当前页码和每页显示数量
+            var currentPage = 1;
+            var pageSize = 10;
+            var totalCount = 0;
 
-            getBookList();
-            function getBookList() {
-                
-            }
-    
-            //翻页信息
-            $("#pageContainer").jqPaginator({
-                totalCounts: 100, //总记录数
-                pageSize: 10,    //每页的个数
-                visiblePages: 5, //可视页数
-                currentPage: 1,  //当前页码
-                first: '<li class="page-item"><a class="page-link">首页</a></li>',
-                prev: '<li class="page-item"><a class="page-link" href="javascript:void(0);">上一页<\/a><\/li>',
-                next: '<li class="page-item"><a class="page-link" href="javascript:void(0);">下一页<\/a><\/li>',
-                last: '<li class="page-item"><a class="page-link" href="javascript:void(0);">最后一页<\/a><\/li>',
-                page: '<li class="page-item"><a class="page-link" href="javascript:void(0);">{{page}}<\/a><\/li>',
-                //页面初始化和页码点击时都会执行
-                onPageChange: function (page, type) {
-                    console.log("第"+page+"页, 类型:"+type);
-                }
+            // 页面加载时获取图书列表
+            $(document).ready(function() {
+                getBookList();
             });
+
+            // 获取图书列表
+            function getBookList() {
+                $.ajax({
+                    url: '/book/getBookListByPage',
+                    type: 'GET',
+                    data: {
+                        currentPage: currentPage,
+                        pageSize: pageSize
+                    },
+                    success: function(result) {
+                        if (result.code === 200 && result.data) {
+                            renderBookTable(result.data.records);
+                            initPagination(result.data.total);
+                        } else {
+                            alert('获取图书列表失败：' + (result.message || '未知错误'));
+                        }
+                    },
+                    error: function() {
+                        alert('获取图书列表失败，请稍后重试！');
+                    }
+                });
+            }
+
+            // 渲染图书表格
+            function renderBookTable(bookList) {
+                var tbody = $('#bookTableBody');
+                tbody.empty();
+
+                if (!bookList || bookList.length === 0) {
+                    tbody.append('<tr><td colspan="9" style="text-align:center;">暂无图书数据</td></tr>');
+                    return;
+                }
+
+                bookList.forEach(function(book) {
+                    var row = '<tr>' +
+                        '<td><input type="checkbox" name="selectBook" value="' + book.id + '" class="book-select"></td>' +
+                        '<td>' + book.id + '</td>' +
+                        '<td>' + (book.bookName || '') + '</td>' +
+                        '<td>' + (book.author || '') + '</td>' +
+                        '<td>' + (book.count || 0) + '</td>' +
+                        '<td>' + (book.price ? book.price.toFixed(2) : '0.00') + '</td>' +
+                        '<td>' + (book.publish || '') + '</td>' +
+                        '<td>' + (book.statusCN || '') + '</td>' +
+                        '<td>' +
+                        '<div class="op">' +
+                        '<a href="book_update.html?bookId=' + book.id + '">修改</a>' +
+                        '<a href="javascript:void(0)" onclick="deleteBook(' + book.id + ')">删除</a>' +
+                        '</div>' +
+                        '</td>' +
+                        '</tr>';
+                    tbody.append(row);
+                });
+            }
+
+            // 初始化分页
+            function initPagination(total) {
+                totalCount = total;
+                
+                // 先销毁旧的分页实例，避免重复绑定事件
+                if (totalCount > 0) {
+                    $("#pageContainer").jqPaginator({
+                        totalCounts: totalCount,
+                        pageSize: pageSize,
+                        visiblePages: 5,
+                        currentPage: currentPage,
+                        first: '<li class="page-item"><a class="page-link">首页</a></li>',
+                        prev: '<li class="page-item"><a class="page-link" href="javascript:void(0);">上一页<\/a><\/li>',
+                        next: '<li class="page-item"><a class="page-link" href="javascript:void(0);">下一页<\/a><\/li>',
+                        last: '<li class="page-item"><a class="page-link" href="javascript:void(0);">最后一页<\/a><\/li>',
+                        page: '<li class="page-item"><a class="page-link" href="javascript:void(0);">{{page}}<\/a><\/li>',
+                        onPageChange: function(page, type) {
+                            // type='change' 表示用户点击页码，type='init' 表示初始化
+                            if (type === 'change') {
+                                console.log("切换到第" + page + "页");
+                                currentPage = page;
+                                getBookList();
+                            }
+                        }
+                    });
+                }
+            }
+
+            // 删除图书
             function deleteBook(id) {
                 var isDelete = confirm("确认删除?");
                 if (isDelete) {
-                    //删除图书
-                    alert("删除成功");
+                    $.ajax({
+                        url: '/book/deleteBookById',
+                        type: 'GET',
+                        data: {
+                            id: id
+                        },
+                        success: function(result) {
+                            if (result.code === 200) {
+                                alert("删除成功");
+                                getBookList(); // 重新加载列表
+                            } else {
+                                alert("删除失败：" + (result.message || '未知错误'));
+                            }
+                        },
+                        error: function() {
+                            alert('删除失败，请稍后重试！');
+                        }
+                    });
                 }
             }
+
+            // 批量删除
             function batchDelete() {
                 var isDelete = confirm("确认批量删除?");
                 if (isDelete) {
-                    //获取复选框的id
+                    // 获取复选框的id
                     var ids = [];
                     $("input:checkbox[name='selectBook']:checked").each(function () {
                         ids.push($(this).val());
                     });
+                    
+                    if (ids.length === 0) {
+                        alert("请先选择要删除的图书");
+                        return;
+                    }
+
                     console.log(ids);
-                    alert("批量删除成功");
+                    // TODO: 实现批量删除接口
+                    alert("批量删除功能待实现");
                 }
             }
-
         </script>
     </div>
 </body>
