@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>博客详情页</title>
+
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/detail.css">
+
+</head>
+
+<body>
+    <div class="nav">
+        <img src="pic/logo2.jpg" alt="">
+        <span class="blog-title">我的博客系统</span>
+        <div class="space"></div>
+        <a class="nav-span" href="blog_list.html">主页</a>
+        <a class="nav-span" href="blog_edit.html">写博客</a>
+        <a class="nav-span" href="#" onclick="logout()">注销</a>
+    </div>
+
+    <div class="container">
+        <div class="left">
+            <div class="card">
+                <img src="pic/doge.jpg" alt="">
+                <h3>比特汤老师</h3>
+                <a href="#">GitHub 地址</a>
+                <div class="row">
+                    <span>文章</span>
+                    <span>分类</span>
+                </div>
+                <div class="row">
+                    <span>2</span>
+                    <span>1</span>
+                </div>
+            </div>
+        </div>
+        <div class="right">
+            <div class="content">
+                <div class="title"></div>
+                <div class="date"></div>
+                <div class="detail"></div>
+                <div class="operating">
+                    <button onclick="window.location.href = 'blog_update.html'">编辑</button>
+                    <button>删除</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 引入 editor.md 的依赖 -->
+    <link rel="stylesheet" href="blog-editormd/css/editormd.css" />
+    <script src="js/jquery.min.js"></script>
+    <script src="blog-editormd/lib/marked.min.js"></script>
+    <script src="blog-editormd/lib/prettify.min.js"></script>
+    <script src="blog-editormd/editormd.js"></script>
+    <script src="js/common.js"></script>
+    <script>
+        
+        //显示博客作者信息
+        //var userUrl = "/user/getAuthorInfo" + location.search;
+        //getUserInfo(userUrl);
+
+        function deleteBlog() {
+            alert("删除博客");
+        }
+
+         getBlogDetail();
+        function getBlogDetail() {
+            $.ajax({
+                type: "get",
+                url: "/blog/getBlogDetail" + location.search,
+                success: function (result) {
+                    //TODO 校验不全面
+                    if (result.code == 200 && result.data != null) {
+                        let blogInfo = result.data;
+                        $(".right .content .title").text(blogInfo.title);
+                        $(".right .content .date").text(blogInfo.updateTime);
+                        // $(".right .content .detail").text(blogInfo.content);
+                        editormd.markdownToHTML("detail", {
+                            markdown: blogInfo.content
+                        });
+                        //判断是否显示 编辑和 删除按钮
+                        let loginUserid = localStorage.getItem("login_userid");
+
+                        if (blogInfo.userId == loginUserid) {
+                            let html = "";
+                            html += '<div class="operating">';
+                            html += '<button onclick="window.location.href=\'blog_update.html' + location.search + '\'">编辑</button>';
+                            html += '<button onclick="deleteBlog()">删除</button>';
+                            html += '</div>';
+                            $(".right .content").append(html);
+                        }
+                    }
+                }
+
+            });
+        }
+
+        let url = "/user/getAuthorInfo" + location.search;
+        getUserInfo(url);
+    </script>
+</body>
+
+</html>
