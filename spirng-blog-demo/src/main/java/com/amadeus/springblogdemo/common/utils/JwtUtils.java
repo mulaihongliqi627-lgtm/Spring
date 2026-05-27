@@ -13,12 +13,18 @@ import java.util.Map;
 
 public class JwtUtils {
 
-    private static final String SECRET = "spring-blog-demo-jwt-secret-key-2026-amadeus";
+    //密钥,HS256 算法要求密钥的长度至少为 256 位（32 字节）,SECRET不能太短
+    private static final String SECRET = "rXRoWn8J+bCcnadUFU88AIqhK9caLJCg+6c2rP8F1EE=";
+    //过期时间
     private static final long EXPIRE_TIME = 1000L * 60 * 60 * 24;
+    //安全密钥
     private static final Key KEY = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
 
     private JwtUtils() {
     }
+
+
+    //生成JWT令牌
 
     public static String genJwt(Map<String, Object> claims) {
         Date now = new Date();
@@ -29,6 +35,7 @@ public class JwtUtils {
                 .signWith(KEY, SignatureAlgorithm.HS256)
                 .compact();
     }
+    //解析JWT令牌
 
     public static Claims parseJwt(String token) {
         try {

@@ -47,7 +47,22 @@
         });
 
         function submit() {
-            alert("发表博客");
+            $.ajax({
+                type: "post",
+                url: "/blog/addBlog",
+                data: {
+                    title: $("#title").val(),
+                    content: $("#content").val(),
+                    userId: localStorage.getItem("login_userid")
+                },
+                success: function (result) {
+                    if (result != null && result.code === 200 && result.data === true) {
+                        location.href = "blog_list.html";
+                    } else {
+                        alert(result && result.message ? result.message : "publish failed");
+                    }
+                }
+            });
         }
     </script>
 </body>

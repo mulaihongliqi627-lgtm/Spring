@@ -22,7 +22,8 @@ public class AppCongig implements WebMvcConfigurer {
             "/css/**",
             "/js/**",
             "/pic/**",
-            "favicon.ico"
+            "/favicon.ico",
+            "/.well-known/**"
 
     );
 

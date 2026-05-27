@@ -9,11 +9,13 @@ import com.amadeus.springblogdemo.domain.UserInfo;
 import com.amadeus.springblogdemo.mapper.BlogInfoMapper;
 import com.amadeus.springblogdemo.mapper.UserInfoMapper;
 import com.amadeus.springblogdemo.pojo.request.UserLoginRequest;
+import com.amadeus.springblogdemo.pojo.request.UserRegisterRequest;
 import com.amadeus.springblogdemo.pojo.response.UserInfoResponse;
 import com.amadeus.springblogdemo.pojo.response.UserLoginResponse;
 import com.amadeus.springblogdemo.service.UserInfoService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.apache.catalina.User;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -67,5 +69,32 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
             throw new BlogException("博客不存在");
         }
         return getUserInfo(blogInfo.getUserId());
+    }
+
+    @Override
+    public UserLoginResponse register(UserRegisterRequest request) {
+        //参数校验
+        if(request == null
+                || !StringUtils.hasText(request.getUserName())
+                || !StringUtils.hasText(request.getPassword())){
+            throw new BlogException("用户名或密码不能为空!");
+        }
+
+        UserInfo newUser = new UserInfo();
+        newUser.setUserName(request.getUserName());
+        newUser.setPassword(SecurityUtils.encrypt(request.getPassword()));
+        newUser.setDeleteFlag(0);
+        //注册账号
+        boolean result =  save(newUser);
+        if(!result){
+            throw new BlogException("注册失败!");
+        }
+        //成功注册,生成token并返回给前端
+        Map<String,Object> claim = new HashMap<>();
+        claim.put("userId",String.valueOf(newUser.getId()));
+        claim.put("userName", newUser.getUserName());
+
+        return new UserLoginResponse(newUser.getId(), JwtUtils.genJwt(claim));
+
     }
 }

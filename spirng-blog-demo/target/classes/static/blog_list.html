@@ -44,7 +44,33 @@
     <script src="js/jquery.min.js"></script>
     <script src="js/common.js"></script>
     <script>
-        getBlogList();
+        let currentUserId = null;
+
+        getUserInfoAndLoadBlogs();
+
+        function getUserInfoAndLoadBlogs() {
+            let url = "/user/getUserInfo?userId="+localStorage.getItem("login_userid");
+            $.ajax({
+                type: "get",
+                url: url,
+                success: function (result) {
+                    if (result != null && result.code === 200 && result.data != null) {
+                        let userInfo = result.data;
+                        currentUserId = userInfo.userId;
+                        $(".left .card h3").text(userInfo.userName || "");
+                        if (userInfo.githubUrl) {
+                            $(".left .card a").attr("href", userInfo.githubUrl);
+                        }
+                    }
+                    getBlogList();
+                },
+                error: function(xhr, status, error) {
+                    console.error("获取用户信息失败:", status, error);
+                    getBlogList();
+                }
+            });
+        }
+
         function getBlogList() {
             $.ajax({
                 type: "get",
@@ -58,6 +84,9 @@
                             finalHtml +='<div class="date">'+blog.localDateTime+'</div>';
                             finalHtml +='<div class="desc">'+blog.content+'</div>';
                             finalHtml +='<a class="detail" href="blog_detail.html?blogId='+blog.id+'">查看全文&gt;&gt;</a>';
+                            if (currentUserId && blog.userId == currentUserId) {
+                                finalHtml +='<button class="delete-btn" onclick="deleteBlog('+blog.id+')">删除</button>';
+                            }
                             finalHtml +='</div>';
                         }
                         $(".container .right").html(finalHtml);
@@ -69,9 +98,29 @@
             });
         }
 
-        let url = "/user/getUserInfo?userId="+localStorage.getItem("login_userid");
-        getUserInfo(url);
+        function deleteBlog(blogId) {
+            if (!confirm('确定要删除这篇博客吗？')) {
+                return;
+            }
 
+            $.ajax({
+                type: "post",
+                url: "/blog/deleteBlog",
+                data: { blogId: blogId },
+                success: function (result) {
+                    if (result) {
+                        alert('删除成功');
+                        getBlogList();
+                    } else {
+                        alert('删除失败');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("删除失败:", status, error);
+                    alert('删除失败，请重试');
+                }
+            });
+        }
     </script>
 </body>
 

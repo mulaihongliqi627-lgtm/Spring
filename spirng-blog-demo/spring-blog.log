@@ -1,0 +1,4 @@
+2026-05-27T13:11:29.024+08:00  INFO 544 --- [spring-blog-demo] [main] com.amadeus.springblogdemo.JWTTest       : Starting JWTTest using Java 17.0.9 with PID 544 (started by Amadeus in D:\code\ideaPrograms\java_steins_gate\java_code\Spring\spirng-blog-demo)
+2026-05-27T13:11:29.042+08:00  INFO 544 --- [spring-blog-demo] [main] com.amadeus.springblogdemo.JWTTest       : No active profile set, falling back to 1 default profile: "default"
+2026-05-27T13:11:32.419+08:00  INFO 544 --- [spring-blog-demo] [main] m.e.s.MybatisPlusApplicationContextAware : Register ApplicationContext instances org.springframework.web.context.support.GenericWebApplicationContext@472698d
+2026-05-27T13:11:32.700+08:00  INFO 544 --- [spring-blog-demo] [main] com.amadeus.springblogdemo.JWTTest       : Started JWTTest in 4.194 seconds (process running for 6.54)

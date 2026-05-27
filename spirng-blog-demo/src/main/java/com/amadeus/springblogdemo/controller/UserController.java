@@ -2,6 +2,7 @@ package com.amadeus.springblogdemo.controller;
 
 
 import com.amadeus.springblogdemo.pojo.request.UserLoginRequest;
+import com.amadeus.springblogdemo.pojo.request.UserRegisterRequest;
 import com.amadeus.springblogdemo.pojo.response.Result;
 import com.amadeus.springblogdemo.pojo.response.UserInfoResponse;
 import com.amadeus.springblogdemo.pojo.response.UserLoginResponse;
@@ -52,5 +53,12 @@ public class UserController {
     public UserInfoResponse getAuthorInfo(@NotNull Integer blogId){
         log.info("获取作者信息,blogId :{}",blogId);
         return userInfoService.getAuthorInfo(blogId);
+    }
+
+
+    @RequestMapping("/register")
+    public UserLoginResponse register(@Validated @RequestBody UserRegisterRequest request){
+        log.info("用户注册,userName :{}",request.getUserName());
+        return userInfoService.register(request);
     }
 }
