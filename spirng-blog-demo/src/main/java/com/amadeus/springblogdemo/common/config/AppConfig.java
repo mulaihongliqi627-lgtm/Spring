@@ -17,6 +17,11 @@ public class AppConfig implements WebMvcConfigurer {
 
     List<String> excludePath = List.of(
             "/user/login",
+            "/user/register",
+            "/user/getUserInfo",
+            "/user/getAuthorInfo",
+            "/blog/getList",
+            "/blog/getBlogDetail",
             "/**/*.html",
             "/blog-editormd/**",
             "/css/**",
@@ -24,7 +29,6 @@ public class AppConfig implements WebMvcConfigurer {
             "/pic/**",
             "/favicon.ico",
             "/.well-known/**"
-
     );
 
     //配置拦截器
