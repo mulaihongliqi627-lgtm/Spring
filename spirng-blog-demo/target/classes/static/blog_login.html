@@ -55,12 +55,14 @@
                 success: function(result){
                     //TODO 只写了核心条件判断
                     if(result!=null && result.code==200 && result.data!=null){
+                        console.log("login response:", result);
                         let response = result.data;
                         localStorage.setItem("user_token", response.token);
                         localStorage.setItem("login_userid", response.userId);
                         location.href = "blog_list.html";
                     }else{
-                        alert(result.errMsg)
+                        console.log("login response:", result);
+                        alert(result && result.message ? result.message : "login failed")
                     }
                 }
             });

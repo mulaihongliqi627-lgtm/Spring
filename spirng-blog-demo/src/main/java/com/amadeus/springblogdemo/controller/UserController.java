@@ -61,4 +61,11 @@ public class UserController {
         log.info("用户注册,userName :{}",request.getUserName());
         return userInfoService.register(request);
     }
+
+
+    @RequestMapping("/logout")
+    public Result<Void> logout(){
+        log.info("用户退出登录");
+        return Result.ok(null);
+    }
 }

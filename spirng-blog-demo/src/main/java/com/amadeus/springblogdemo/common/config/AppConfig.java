@@ -20,6 +20,7 @@ public class AppConfig implements WebMvcConfigurer {
             "/user/register",
             "/user/getUserInfo",
             "/user/getAuthorInfo",
+            "/user/logout",
             "/blog/getList",
             "/blog/getBlogDetail",
             "/**/*.html",

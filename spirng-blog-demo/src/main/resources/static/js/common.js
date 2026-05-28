@@ -1,5 +1,18 @@
+function getLoginToken() {
+    return localStorage.getItem("user_token");
+}
+
+function requireLogin() {
+    if (!getLoginToken()) {
+        alert("请先登录");
+        location.href = "blog_login.html";
+        return false;
+    }
+    return true;
+}
+
 $(document).ajaxSend(function (event, xhr) {
-    let token = localStorage.getItem("user_token");
+    let token = getLoginToken();
     if (token) {
         xhr.setRequestHeader("Authorization", token);
     }
@@ -30,6 +43,7 @@ function getUserInfo(url) {
 }
 
 function logout() {
+    //退出登录,删除token
     localStorage.removeItem("user_token");
     localStorage.removeItem("login_userid");
     location.href = "blog_login.html";

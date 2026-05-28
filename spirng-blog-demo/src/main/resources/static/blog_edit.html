@@ -39,6 +39,9 @@
     <script type="text/javascript">
 
         $(function () {
+            if (!requireLogin()) {
+                return;
+            }
             var editor = editormd("editor", {
                 width: "100%",
                 height: "550px",
@@ -47,9 +50,19 @@
         });
 
         function submit() {
+            if (!requireLogin()) {
+                return;
+            }
             $.ajax({
                 type: "post",
                 url: "/blog/addBlog",
+                beforeSend: function (xhr) {
+                    let token = getLoginToken();
+                    console.log("addBlog token:", token);
+                    if (token) {
+                        xhr.setRequestHeader("Authorization", token);
+                    }
+                },
                 data: {
                     title: $("#title").val(),
                     content: $("#content").val(),
