@@ -12,7 +12,6 @@ import com.amadeus.lotterysystem.service.dto.UserRegisterDTO;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,6 +28,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+
     @PostMapping("/register")
     public CommonResult<UserRegisterResult> userRegister(
             @Validated @RequestBody UserRegisterParam param){
@@ -44,5 +44,4 @@ public class UserController {
         }
         return new UserRegisterResult(userRegisterDTO.getUserId());
     }
-
 }

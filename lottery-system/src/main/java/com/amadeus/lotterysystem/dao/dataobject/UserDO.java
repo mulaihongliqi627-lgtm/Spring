@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("user")
+@TableName(value = "user", autoResultMap = true)
 public class UserDO extends BaseDO {
     /**
      * 用户名

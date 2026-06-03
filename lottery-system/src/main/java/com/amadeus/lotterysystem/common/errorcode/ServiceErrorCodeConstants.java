@@ -16,4 +16,7 @@ public interface ServiceErrorCodeConstants {
     ErrorCode LOGIN_NOT_EXIST = new ErrorCode(109, "登录方式不存在");
     ErrorCode USER_INFO_IS_EMPTY = new ErrorCode(110, "用户信息为空");
     ErrorCode VERIFICATION_CODE_ERROR = new ErrorCode(111, "验证码校验失败");
+    ErrorCode SMS_CONFIG_ERROR = new ErrorCode(112, "短信配置不完整");
+    ErrorCode SMS_SEND_ERROR = new ErrorCode(113, "验证码发送失败");
+    ErrorCode VERIFICATION_CODE_FREQUENT = new ErrorCode(114, "验证码发送过于频繁");
 }
