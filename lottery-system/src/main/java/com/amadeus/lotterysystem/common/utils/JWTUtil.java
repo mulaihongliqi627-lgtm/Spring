@@ -74,11 +74,14 @@ public class JWTUtil {
     /**
      * 从token中获取用户ID
      */
-    public static Integer getUserIdFromToken(String jwtToken) {
+    public static Long getUserIdFromToken(String jwtToken) {
         Claims claims = JWTUtil.parseJWT(jwtToken);
         if (claims != null) {
             Map<String, Object> userInfo = new HashMap<>(claims);
-            return (Integer) userInfo.get("userId");
+            Object userId = userInfo.get("userId");
+            if (userId instanceof Number number) {
+                return number.longValue();
+            }
         }
         return null;
     }

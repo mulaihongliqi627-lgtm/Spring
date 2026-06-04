@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>管理员登录页面</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            font-family: Arial, "Microsoft YaHei", sans-serif;
+            color: #1f2933;
+            background: #eef3f8;
+        }
+
+        a {
+            color: #0f766e;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .login-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 32px 16px;
+        }
+
+        .login-box {
+            width: 100%;
+            max-width: 980px;
+            min-height: 560px;
+            display: grid;
+            grid-template-columns: minmax(0, 1.25fr) minmax(340px, 0.75fr);
+            overflow: hidden;
+            border: 1px solid #dce5ee;
+            border-radius: 8px;
+            background: #fff;
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
+        }
+
+        .img-box {
+            position: relative;
+            min-height: 560px;
+            padding: 42px;
+            color: #fff;
+            background:
+                    linear-gradient(135deg, rgba(15, 76, 92, 0.94), rgba(164, 91, 55, 0.84)),
+                    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='720' viewBox='0 0 900 720'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='.18' stroke-width='2'%3E%3Cpath d='M82 126h238l106 106h290'/%3E%3Cpath d='M118 258h210l82 82h348'/%3E%3Cpath d='M98 506c118-46 236-46 354 0s236 46 354 0'/%3E%3Cpath d='M112 604c132-40 264-40 396 0s264 40 396 0'/%3E%3Cpath d='M204 104l84 84-84 84-84-84z'/%3E%3Cpath d='M650 124l102 58-102 58-102-58z'/%3E%3Cpath d='M502 396l142 80-142 80-142-80z'/%3E%3C/g%3E%3C/svg%3E");
+            background-size: cover;
+            background-position: center;
+        }
+
+        .img-box::after {
+            content: "";
+            position: absolute;
+            right: 42px;
+            bottom: 42px;
+            width: 220px;
+            height: 220px;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 8px;
+            background:
+                    linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.04)),
+                    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.16) 0 1px, transparent 1px 14px);
+        }
+
+        .brand-mark {
+            width: 54px;
+            height: 54px;
+            display: grid;
+            place-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.34);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.13);
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .brand-copy {
+            position: relative;
+            z-index: 1;
+            max-width: 430px;
+            margin-top: 112px;
+        }
+
+        .brand-copy h1 {
+            margin: 0 0 16px;
+            font-size: 36px;
+            line-height: 1.2;
+            letter-spacing: 0;
+        }
+
+        .brand-copy p {
+            margin: 0;
+            color: rgba(255, 255, 255, 0.78);
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+        .login-container {
+            padding: 48px 38px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .tab-box {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 28px;
+            border-bottom: 1px solid #e5ebf1;
+        }
+
+        .tab-span {
+            position: relative;
+            padding: 0 0 13px;
+            color: #667085;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .tab-span.active {
+            color: #0f766e;
+        }
+
+        .tab-span.active::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -1px;
+            height: 3px;
+            border-radius: 3px 3px 0 0;
+            background: #0f766e;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #344054;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .form-control {
+            width: 100%;
+            height: 44px;
+            padding: 9px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            outline: none;
+            color: #1f2933;
+            background: #fff;
+            font-size: 15px;
+        }
+
+        .form-control:focus {
+            border-color: #0f766e;
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.13);
+        }
+
+        .identity-box {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 18px;
+            padding: 4px;
+            border: 1px solid #dbe3ef;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+
+        .identity-option input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .identity-option span {
+            display: grid;
+            place-items: center;
+            min-height: 40px;
+            border-radius: 6px;
+            color: #475569;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .identity-option input:checked + span {
+            color: #fff;
+            background: #0f766e;
+            box-shadow: 0 8px 18px rgba(15, 118, 110, 0.2);
+        }
+
+        .login-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin: 4px 0 22px;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .remember {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            user-select: none;
+        }
+
+        .remember input {
+            width: 16px;
+            height: 16px;
+            accent-color: #0f766e;
+        }
+
+        .btn {
+            width: 100%;
+            height: 46px;
+            border: 0;
+            border-radius: 6px;
+            color: #fff;
+            background: #0f766e;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        .btn:hover {
+            background: #0b625b;
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn:disabled {
+            cursor: not-allowed;
+            background: #94a3b8;
+            transform: none;
+        }
+
+        .error {
+            display: none;
+            margin-top: 14px;
+            padding: 11px 12px;
+            border: 1px solid #fecdca;
+            border-radius: 6px;
+            color: #b42318;
+            background: #fef3f2;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .success {
+            display: none;
+            margin-top: 14px;
+            padding: 11px 12px;
+            border: 1px solid #abefc6;
+            border-radius: 6px;
+            color: #05603a;
+            background: #ecfdf3;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .field-error {
+            display: none;
+            margin-top: 6px;
+            color: #d92d20;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .register-link {
+            margin-top: 22px;
+            color: #64748b;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        @media (max-width: 800px) {
+            .login-box {
+                max-width: 460px;
+                grid-template-columns: 1fr;
+            }
+
+            .img-box {
+                min-height: 230px;
+                padding: 28px;
+            }
+
+            .img-box::after {
+                width: 120px;
+                height: 120px;
+                right: 24px;
+                bottom: 24px;
+            }
+
+            .brand-copy {
+                margin-top: 34px;
+            }
+
+            .brand-copy h1 {
+                font-size: 28px;
+            }
+
+            .login-container {
+                padding: 32px 24px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .login-page {
+                padding: 16px 10px;
+            }
+
+            .login-actions {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body class="login-page">
+<div class="login-box">
+    <div class="img-box">
+        <div class="brand-mark">L</div>
+        <div class="brand-copy">
+            <h1>抽奖系统管理端</h1>
+            <p>进入后台管理活动、奖池和中奖记录，保持每一次抽奖都有清晰的配置与归档。</p>
+        </div>
+    </div>
+
+    <div class="login-container">
+        <div class="tab-box">
+            <span class="active tab-span" data-form="loginForm">密码登录</span>
+        </div>
+
+        <form id="loginForm" novalidate>
+            <div class="identity-box" role="radiogroup" aria-label="登录身份">
+                <label class="identity-option">
+                    <input type="radio" name="mandatoryIdentity" value="ADMIN" checked>
+                    <span>管理员</span>
+                </label>
+                <label class="identity-option">
+                    <input type="radio" name="mandatoryIdentity" value="NORMAL">
+                    <span>普通用户</span>
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label for="loginName">手机号或邮箱</label>
+                <input class="form-control" type="text" id="loginName" name="loginName" autocomplete="username" placeholder="请输入手机号或邮箱">
+                <div class="field-error" data-error-for="loginName"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input class="form-control" type="password" id="password" name="password" autocomplete="current-password" placeholder="请输入密码">
+                <div class="field-error" data-error-for="password"></div>
+            </div>
+
+            <div class="login-actions">
+                <label class="remember" for="rememberLogin">
+                    <input type="checkbox" id="rememberLogin" checked>
+                    <span>记住登录信息</span>
+                </label>
+                <a href="register.html?admin=true">注册管理员账号</a>
+            </div>
+
+            <button type="submit" class="btn login-btn" id="submitBtn">登录</button>
+            <div class="error" id="errorMessage"></div>
+            <div class="success" id="successMessage"></div>
+        </form>
+
+        <div class="register-link">
+            还没有账号，去 <a href="register.html?admin=true">注册</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    var form = document.getElementById('loginForm');
+    var submitBtn = document.getElementById('submitBtn');
+    var errorMessage = document.getElementById('errorMessage');
+    var successMessage = document.getElementById('successMessage');
+    var rememberLogin = document.getElementById('rememberLogin');
+    var loginNameInput = document.getElementById('loginName');
+    var savedLoginName = localStorage.getItem('loginName');
+    var savedIdentity = localStorage.getItem('identity');
+
+    if (savedLoginName) {
+        loginNameInput.value = savedLoginName;
+    }
+
+    if (savedIdentity) {
+        var savedIdentityInput = document.querySelector('input[name="mandatoryIdentity"][value="' + savedIdentity + '"]');
+        if (savedIdentityInput) {
+            savedIdentityInput.checked = true;
+        }
+    }
+
+    form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        clearMessages();
+        clearFieldErrors();
+
+        var payload = {
+            loginName: getValue('loginName'),
+            password: getValue('password'),
+            mandatoryIdentity: getCheckedIdentity()
+        };
+
+        if (payload.loginName.indexOf('@') > -1) {
+            payload.loginName = payload.loginName.toLowerCase();
+        }
+
+        var errors = validatePayload(payload);
+        if (Object.keys(errors).length > 0) {
+            showFieldErrors(errors);
+            return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = '登录中...';
+
+        fetch('/user/password/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        })
+            .then(function (response) {
+                return response.text();
+            })
+            .then(function (text) {
+                var result = parseLoginResult(text);
+
+                if (!result || result.code !== 200) {
+                    throw new Error((result && result.errorMsg) || '登录失败，请检查账号、密码和身份');
+                }
+
+                if (!result.token) {
+                    throw new Error('登录成功但后端未返回 token');
+                }
+
+                var returnedIdentity = normalizeIdentity(result.identity);
+                if (!returnedIdentity) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('identity');
+                    throw new Error('登录成功但后端未返回身份信息');
+                }
+
+                if (returnedIdentity !== payload.mandatoryIdentity) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('identity');
+                    throw new Error('身份不匹配，请选择' + formatIdentity(returnedIdentity) + '登录');
+                }
+
+                localStorage.setItem('token', result.token);
+                localStorage.setItem('identity', returnedIdentity);
+
+                if (rememberLogin.checked) {
+                    localStorage.setItem('loginName', payload.loginName);
+                } else {
+                    localStorage.removeItem('loginName');
+                }
+
+                showSuccess('登录成功，Token 已保存。身份：' + formatIdentity(returnedIdentity));
+            })
+            .catch(function (error) {
+                showError(error.message || '登录失败，请稍后重试');
+            })
+            .finally(function () {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '登录';
+            });
+    });
+
+    function getValue(id) {
+        return document.getElementById(id).value.trim();
+    }
+
+    function getCheckedIdentity() {
+        var checked = document.querySelector('input[name="mandatoryIdentity"]:checked');
+        return checked ? checked.value : 'ADMIN';
+    }
+
+    function validatePayload(payload) {
+        var errors = {};
+        var phoneReg = /^1[3-9][0-9]{9}$/;
+        var mailReg = /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+\.){1,63}[a-z0-9]+$/;
+        var passwordReg = /^[0-9A-Za-z]{6,12}$/;
+        var isMail = mailReg.test(payload.loginName);
+        var isPhone = phoneReg.test(payload.loginName);
+
+        if (!payload.loginName) {
+            errors.loginName = '请输入手机号或邮箱';
+        } else if (!isPhone && !isMail) {
+            errors.loginName = '请输入正确的手机号或邮箱';
+        }
+
+        if (!payload.password) {
+            errors.password = '请输入密码';
+        } else if (!passwordReg.test(payload.password)) {
+            errors.password = '密码必须是 6-12 位数字或字母';
+        }
+
+        return errors;
+    }
+
+    function clearMessages() {
+        errorMessage.textContent = '';
+        errorMessage.style.display = 'none';
+        successMessage.textContent = '';
+        successMessage.style.display = 'none';
+    }
+
+    function clearFieldErrors() {
+        document.querySelectorAll('.field-error').forEach(function (item) {
+            item.textContent = '';
+            item.style.display = 'none';
+        });
+    }
+
+    function showFieldErrors(errors) {
+        Object.keys(errors).forEach(function (field) {
+            var target = document.querySelector('[data-error-for="' + field + '"]');
+            if (target) {
+                target.textContent = errors[field];
+                target.style.display = 'block';
+            }
+        });
+    }
+
+    function showError(text) {
+        errorMessage.textContent = text;
+        errorMessage.style.display = 'block';
+        successMessage.style.display = 'none';
+    }
+
+    function showSuccess(text) {
+        successMessage.textContent = text;
+        successMessage.style.display = 'block';
+        errorMessage.style.display = 'none';
+    }
+
+    function parseLoginResult(text) {
+        if (!text) {
+            return null;
+        }
+
+        var parsed = JSON.parse(text);
+        return {
+            code: parsed.code,
+            errorMsg: parsed.errorMsg,
+            token: parsed.data && parsed.data.token,
+            identity: parsed.data && parsed.data.identity
+        };
+    }
+
+    function formatIdentity(identity) {
+        return identity === 'ADMIN' ? '管理员' : '普通用户';
+    }
+
+    function normalizeIdentity(identity) {
+        return identity ? String(identity).trim().toUpperCase() : '';
+    }
+</script>
+</body>
+</html>

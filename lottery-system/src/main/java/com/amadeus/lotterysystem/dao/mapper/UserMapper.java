@@ -25,9 +25,9 @@ public interface UserMapper extends BaseMapper<UserDO> {
     @Select("""
         SELECT COUNT(*)
         FROM user
-        WHERE email = #{email,typeHandler=com.amadeus.lotterysystem.dao.handler.EncryptTypeHandler}
+        WHERE email = #{email}
     """)
-    long countByEmailLong(@Param("email") Encrypt email);
+    long countByEmailLong(@Param("email") String email);
 
     @Select("""
         SELECT id, gmt_create, gmt_modified, user_name, email, phone_number, password, identity
@@ -46,5 +46,25 @@ public interface UserMapper extends BaseMapper<UserDO> {
             @Result(column = "identity", property = "identity")
     })
     UserDO selectByPhoneNumber(@Param("phone") Encrypt phoneNumber);
+
+
+
+    @Select("""
+        SELECT id, gmt_create, gmt_modified, user_name, email, phone_number, password, identity
+        FROM user
+        WHERE email = #{email}
+        LIMIT 1
+    """)
+    @Results(value = {
+            @Result(column = "id", property = "id"),
+            @Result(column = "gmt_create", property = "gmtCreate"),
+            @Result(column = "gmt_modified", property = "gmtModified"),
+            @Result(column = "user_name", property = "userName"),
+            @Result(column = "email", property = "email"),
+            @Result(column = "phone_number", property = "phoneNumber", typeHandler = EncryptTypeHandler.class),
+            @Result(column = "password", property = "password"),
+            @Result(column = "identity", property = "identity")
+    })
+    UserDO selectByEmail(@Param("email") String email);
 
 }
