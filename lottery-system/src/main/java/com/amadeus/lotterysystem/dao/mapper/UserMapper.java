@@ -5,11 +5,15 @@ import com.amadeus.lotterysystem.dao.dataobject.Encrypt;
 import com.amadeus.lotterysystem.dao.dataobject.UserDO;
 import com.amadeus.lotterysystem.dao.handler.EncryptTypeHandler;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.sun.source.doctree.SeeTree;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 @Mapper
 public interface UserMapper extends BaseMapper<UserDO> {
@@ -67,4 +71,15 @@ public interface UserMapper extends BaseMapper<UserDO> {
     })
     UserDO selectByEmail(@Param("email") String email);
 
+
+
+    @Select("<script>" +
+            " select id, gmt_create, gmt_modified, user_name, email, phone_number, password, identity from user" +
+            " <if test=\"identity!=null\">" +
+            "    where identity = #{identity}" +
+            " </if>" +
+            " order by id desc" +
+            " </script>")
+    @ResultMap("UserDOMap")
+    List<UserDO> selectUserListByIdentity(@Param("identity")String identity);
 }

@@ -27,8 +27,8 @@ public class AppConfig implements WebMvcConfigurer {
             "/*.jpg",
             "/*.png",
             "/favicon.ico",
-            "/**/login",
-            "/register"
+            "/user/password/login",
+            "/user/register"
     );
 
     @Override

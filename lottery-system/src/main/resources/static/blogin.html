@@ -406,6 +406,7 @@
     var loginNameInput = document.getElementById('loginName');
     var savedLoginName = localStorage.getItem('loginName');
     var savedIdentity = localStorage.getItem('identity');
+    var queryParams = new URLSearchParams(window.location.search);
 
     if (savedLoginName) {
         loginNameInput.value = savedLoginName;
@@ -476,7 +477,9 @@
                     throw new Error('身份不匹配，请选择' + formatIdentity(returnedIdentity) + '登录');
                 }
 
-                localStorage.setItem('token', result.token);
+                var token = normalizeToken(result.token);
+                localStorage.setItem('token', token);
+                localStorage.setItem('user_token', token);
                 localStorage.setItem('identity', returnedIdentity);
 
                 if (rememberLogin.checked) {
@@ -485,7 +488,11 @@
                     localStorage.removeItem('loginName');
                 }
 
-                showSuccess('登录成功，Token 已保存。身份：' + formatIdentity(returnedIdentity));
+                showSuccess('登录成功，Token 已保存。正在进入' + formatIdentity(returnedIdentity) + '页面...');
+                var redirectPath = getRedirectPath(returnedIdentity);
+                window.setTimeout(function () {
+                    window.top.location.href = redirectPath;
+                }, 300);
             })
             .catch(function (error) {
                 showError(error.message || '登录失败，请稍后重试');
@@ -584,6 +591,23 @@
 
     function normalizeIdentity(identity) {
         return identity ? String(identity).trim().toUpperCase() : '';
+    }
+
+    function normalizeToken(token) {
+        return token ? String(token).trim().replace(/^"+|"+$/g, '') : '';
+    }
+
+    function getRedirectPath(identity) {
+        var redirect = queryParams.get('redirect');
+        if (redirect && redirect.charAt(0) === '/') {
+            return redirect;
+        }
+
+        if (identity === 'ADMIN') {
+            return '/admin.html';
+        }
+
+        return '/admin.html';
     }
 </script>
 </body>

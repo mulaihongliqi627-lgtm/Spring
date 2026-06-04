@@ -12,6 +12,7 @@ import com.amadeus.lotterysystem.dao.dataobject.Encrypt;
 import com.amadeus.lotterysystem.dao.dataobject.UserDO;
 import com.amadeus.lotterysystem.dao.mapper.UserMapper;
 import com.amadeus.lotterysystem.service.UserService;
+import com.amadeus.lotterysystem.service.dto.UserDTO;
 import com.amadeus.lotterysystem.service.dto.UserLoginDTO;
 import com.amadeus.lotterysystem.service.dto.UserRegisterDTO;
 import com.amadeus.lotterysystem.service.enums.UserIdentityEnum;
@@ -21,8 +22,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -56,6 +59,31 @@ public class UserServiceImpl implements UserService {
         UserRegisterDTO userRegisterDTO = new UserRegisterDTO();
         userRegisterDTO.setUserId(userDO.getId());
         return userRegisterDTO;
+    }
+
+    /**
+     * 获取人员列表
+     * @return
+     */
+
+    @Override
+    public List<UserDTO> findUserInfoList(UserIdentityEnum identity) {
+        //参数校验
+        String identityString = null == identity ? null : identity.name();
+
+        List<UserDO> userDOList = userMapper.selectUserListByIdentity(identityString);
+        List<UserDTO> userDTOList = userDOList.stream()
+                .map(userDO -> {
+                    UserDTO userDTO = new UserDTO();
+                    userDTO.setUserId(userDO.getId());
+                    userDTO.setUserName(userDO.getUserName());
+                    userDTO.setEmail(userDO.getEmail());
+                    userDTO.setPhoneNumber(userDO.getPhoneNumber() == null ? null : userDO.getPhoneNumber().getValue());
+                    userDTO.setIdentity(UserIdentityEnum.forName(userDO.getIdentity()));
+                    return userDTO;
+                }).collect(Collectors.toList());
+
+        return userDTOList;
     }
 
     @Override
