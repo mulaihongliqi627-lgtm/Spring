@@ -21,8 +21,12 @@ public interface ServiceErrorCodeConstants {
     ErrorCode VERIFICATION_CODE_FREQUENT = new ErrorCode(114, "验证码发送过于频繁");
     ErrorCode LOGIN_INFO_IS_EMPTY = new ErrorCode(115, "登录信息为空");
 
-
     // ------ 奖品模块错误码 --------
+
+    ErrorCode CREATE_PRIZE_NAME_IS_EMPTY = new ErrorCode(201, "奖品名称不能为空");
+    ErrorCode CREATE_PRIZE_DESCRIPTION_IS_EMPTY = new ErrorCode(202, "奖品描述不能为空");
+    ErrorCode CREATE_PRIZE_PRICE_IS_EMPTY = new ErrorCode(203, "奖品金额不能为空");
+    ErrorCode CREATE_PRIZE_PARAM_ERROR = new ErrorCode(204, "创建奖品参数错误");
 
 
     // ------ 活动模块错误码 --------

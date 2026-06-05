@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
+//配置表名映射和加密字段转换
 @TableName(value = "user", autoResultMap = true)
 public class UserDO extends BaseDO {
     /**

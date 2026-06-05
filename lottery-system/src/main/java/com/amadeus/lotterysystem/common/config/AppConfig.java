@@ -23,7 +23,6 @@ public class AppConfig implements WebMvcConfigurer {
             "/**/*.html",
             "/css/**",
             "/js/**",
-            "/prize/pic/**",
             "/*.jpg",
             "/*.png",
             "/favicon.ico",
