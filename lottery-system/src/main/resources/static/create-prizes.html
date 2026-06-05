@@ -148,17 +148,24 @@
 <script>
     var userToken = localStorage.getItem("user_token");
 
-    var formData = new FormData();
     // 提交奖品数据的函数
     function submitPrizes() {
         var prizeName = $('#prizeName').val();
         var description = $('#description').val();
         var price = $('#price').val();
-        formData.append("param", JSON.stringify({
+        var file = document.getElementById("prizeImageUrl").files[0];
+        if (!file) {
+            alert('请先上传奖品图片');
+            return;
+        }
+
+        var formData = new FormData();
+        formData.append("param", new Blob([JSON.stringify({
             prizeName:prizeName,
             description:description,
             price:price,
-        }));
+        })], {type: "application/json"}));
+        formData.append("prizePic", file);
         // 发送POST请求到后端接口
         $.ajax({
             url: '/prize/create',
@@ -176,7 +183,7 @@
                 if(result.code == 200) {
                     alert('奖品创建成功！');
                 } else {
-                    alert('创建奖品失败：' + result.msg);
+                    alert('创建奖品失败：' + result.errorMsg);
                 }
             },
             error:function(err){
@@ -193,7 +200,6 @@
     // 上传图片：读取用户通过文件输入选择的图片文件，并将其显示在一个网页元素中
     function showImg(){
         var file =  document.getElementById("prizeImageUrl").files[0];
-        formData.append("prizePic",file);
         var r= new FileReader();
         result = r.readAsDataURL(file);
         r.onload=function (e) {
