@@ -1,11 +1,17 @@
 package com.amadeus.lotterysystem.controller;
 
 
+import com.amadeus.lotterysystem.common.errorcode.ControllerErrorCodeConstants;
+import com.amadeus.lotterysystem.common.exception.ControllerException;
 import com.amadeus.lotterysystem.common.pojo.CommonResult;
 import com.amadeus.lotterysystem.common.utils.JacksonUtil;
 import com.amadeus.lotterysystem.controller.param.CreatePrizeParam;
+import com.amadeus.lotterysystem.controller.param.PageParam;
+import com.amadeus.lotterysystem.controller.result.FindPrizeListResult;
 import com.amadeus.lotterysystem.service.PictureService;
 import com.amadeus.lotterysystem.service.PrizeService;
+import com.amadeus.lotterysystem.service.dto.PageListDTO;
+import com.amadeus.lotterysystem.service.dto.PrizeDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -45,6 +51,35 @@ public class PrizeController {
 
         log.info("创建奖品请求,param={},picFile={}", JacksonUtil.writeValueAsString(param),picFile);
         return CommonResult.success(prizeService.createPrize(param,picFile));
+    }
+
+    @RequestMapping("/find-list")
+    public CommonResult<FindPrizeListResult> findPrizeList(PageParam pageParam){
+        log.info("查询奖品列表{}",JacksonUtil.writeValueAsString(pageParam));
+
+        PageListDTO<PrizeDTO> pageListDTO = prizeService.findPrizeList(pageParam);
+        return CommonResult.success(converToFindPrizeListResult(pageListDTO));
+
+    }
+
+    private FindPrizeListResult converToFindPrizeListResult(PageListDTO<PrizeDTO> pageListDTO) {
+        if(null == pageListDTO){
+            throw new ControllerException(ControllerErrorCodeConstants.FIND_PRIZE_LIST_ERROR);
+        }
+        FindPrizeListResult result = new FindPrizeListResult();
+        result.setTotal(pageListDTO.getTotal());
+        result.setRecords(pageListDTO.getRecords().stream()
+                .map(prizeDTO -> {
+                    FindPrizeListResult.PrizeInfo prizeInfo = new FindPrizeListResult.PrizeInfo();
+                    prizeInfo.setPrizeId(prizeDTO.getPrizeId());
+                    prizeInfo.setPrizeName(prizeDTO.getName());
+                    prizeInfo.setDescription(prizeDTO.getDescription());
+                    prizeInfo.setPrice(prizeDTO.getPrice());
+                    prizeInfo.setImageUrl(prizeDTO.getImageUrl());
+                    return prizeInfo;
+                }
+        ).toList());
+        return result;
     }
 
 }
