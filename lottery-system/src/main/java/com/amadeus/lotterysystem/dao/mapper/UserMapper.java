@@ -82,4 +82,13 @@ public interface UserMapper extends BaseMapper<UserDO> {
             " </script>")
     @ResultMap("UserDOMap")
     List<UserDO> selectUserListByIdentity(@Param("identity")String identity);
+
+
+    @Select("<script>" +
+            "SELECT id FROM user WHERE id IN " +
+            "<foreach collection='userIds' item='id' open='(' separator=',' close=')'>" +
+            "#{id}" +
+            "</foreach>" +
+            "</script>")
+    List<Long> selectByIds(@Param("userIds") List<Long> userIds);
 }

@@ -4,6 +4,7 @@ import com.amadeus.lotterysystem.common.errorcode.ErrorCode;
 import com.amadeus.lotterysystem.common.errorcode.GlobalErrorCodeConstants;
 import com.amadeus.lotterysystem.common.errorcode.ServiceErrorCodeConstants;
 import com.amadeus.lotterysystem.common.pojo.CommonResult;
+import com.amadeus.lotterysystem.controller.param.CreateActivityParam;
 import com.amadeus.lotterysystem.controller.param.CreatePrizeParam;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +40,31 @@ public class GlobalExceptionHandler {
     }
 
     private ErrorCode getServiceValidationErrorCode(Class<?> parameterType, FieldError fieldError) {
-        if (fieldError == null || !CreatePrizeParam.class.equals(parameterType)) {
+        if (fieldError == null) {
+            return null;
+        }
+
+        if (CreateActivityParam.class.equals(parameterType)) {
+            return switch (fieldError.getField()) {
+                case "activityUserList" -> ServiceErrorCodeConstants.ACTIVITY_USER_ERROR;
+                case "acticityPrizeList" -> ServiceErrorCodeConstants.ACTIVITY_PRIZE_ERROR;
+                default -> {
+                    if (fieldError.getField().startsWith("activityUserList")) {
+                        yield ServiceErrorCodeConstants.ACTIVITY_USER_ERROR;
+                    }
+                    if (fieldError.getField().startsWith("acticityPrizeList")
+                            && fieldError.getField().endsWith(".prizeTiers")) {
+                        yield ServiceErrorCodeConstants.ACTIVITY_PRIZE_TIERS_ERROR;
+                    }
+                    if (fieldError.getField().startsWith("acticityPrizeList")) {
+                        yield ServiceErrorCodeConstants.ACTIVITY_PRIZE_ERROR;
+                    }
+                    yield ServiceErrorCodeConstants.CREATE_ACTIVITY_INFO_IS_EMPTY;
+                }
+            };
+        }
+
+        if (!CreatePrizeParam.class.equals(parameterType)) {
             return null;
         }
 

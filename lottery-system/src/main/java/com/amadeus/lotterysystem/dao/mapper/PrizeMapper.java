@@ -18,4 +18,15 @@ public interface PrizeMapper extends BaseMapper<PrizeDO> {
 
     @Select("select id, gmt_create, gmt_modified, name, description, price, image_url from prize limit #{offset}, #{pageSize}")
     List<PrizeDO> findPrizeList(@Param("offset") Integer offset, @Param("pageSize") Integer pageSize);
+
+
+
+    @Select("<script>" +
+            " select id from prize" +
+            " where id in" +
+            " <foreach item='item' collection='items' open='(' separator=',' close=')'>" +
+            " #{item}" +
+            " </foreach>" +
+            " </script>")
+    List<Long> selectExistIdByIds(@Param("items") List<Long> ids);
 }
