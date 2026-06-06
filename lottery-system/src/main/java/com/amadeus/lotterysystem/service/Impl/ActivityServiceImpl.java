@@ -7,18 +7,22 @@ import com.amadeus.lotterysystem.common.utils.RedisUtil;
 import com.amadeus.lotterysystem.controller.param.CreateActivityParam;
 import com.amadeus.lotterysystem.controller.param.CreatePrizeByActivityParam;
 import com.amadeus.lotterysystem.controller.param.CreateUserByActivityParam;
+import com.amadeus.lotterysystem.controller.param.PageParam;
 import com.amadeus.lotterysystem.dao.dataobject.ActivityDO;
 import com.amadeus.lotterysystem.dao.dataobject.ActivityPrizeDO;
 import com.amadeus.lotterysystem.dao.dataobject.ActivityUserDO;
 import com.amadeus.lotterysystem.dao.dataobject.PrizeDO;
+import com.amadeus.lotterysystem.dao.dataobject.UserDO;
 import com.amadeus.lotterysystem.dao.mapper.ActivityMapper;
 import com.amadeus.lotterysystem.dao.mapper.ActivityPrizeMapper;
 import com.amadeus.lotterysystem.dao.mapper.ActivityUserMapper;
 import com.amadeus.lotterysystem.dao.mapper.PrizeMapper;
 import com.amadeus.lotterysystem.dao.mapper.UserMapper;
 import com.amadeus.lotterysystem.service.ActivityService;
+import com.amadeus.lotterysystem.service.dto.ActivityDTO;
 import com.amadeus.lotterysystem.service.dto.ActivityDetailDTO;
 import com.amadeus.lotterysystem.service.dto.CreateActivityDTO;
+import com.amadeus.lotterysystem.service.dto.PageListDTO;
 import com.amadeus.lotterysystem.service.enums.ActivityPrizeStatusEnum;
 import com.amadeus.lotterysystem.service.enums.ActivityPrizeTiersEnum;
 import com.amadeus.lotterysystem.service.enums.ActivityStatusEnum;
@@ -31,7 +35,9 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
@@ -70,7 +76,7 @@ public class ActivityServiceImpl implements ActivityService {
     @Transactional(rollbackFor = Exception.class)
     public CreateActivityDTO createActivity(CreateActivityParam param) {
         //校验活动参数
-        checkActivityParam(param);
+        Map<Long, UserDO> userDOMap = checkActivityParam(param);
 
         //保存活动信息
         ActivityDO activityDO = new ActivityDO();
@@ -99,9 +105,10 @@ public class ActivityServiceImpl implements ActivityService {
                 .stream()
                 .map(user -> {
                     ActivityUserDO activityUserDO = new ActivityUserDO();
+                    UserDO userDO = userDOMap.get(user.getUsreId());
                     activityUserDO.setActivityId(activityDO.getId());
                     activityUserDO.setUserId(user.getUsreId());
-                    activityUserDO.setUserName(user.getUserName());
+                    activityUserDO.setUserName(userDO.getUserName());
                     activityUserDO.setStatus(ActivityUserStatusEnum.INIT.name());
                     return activityUserDO;
                 }).collect(Collectors.toList());
@@ -122,6 +129,30 @@ public class ActivityServiceImpl implements ActivityService {
         CreateActivityDTO createActivityDTO = new CreateActivityDTO();
         createActivityDTO.setActivityId(activityDO.getId());
         return createActivityDTO;
+    }
+
+    @Override
+    public PageListDTO<ActivityDTO> findActivityList(PageParam param) {
+        PageListDTO<ActivityDTO> pageListDTO = new PageListDTO<>();
+        //计算总活动数
+        pageListDTO.setTotal(activityMapper.selectCount(null));
+
+        //查出活动列表
+        List<ActivityDO> activityDOList = activityMapper.selectActivityList(param.offest(),param.getPageSize());
+
+        List<ActivityDTO> activityDTOList = activityDOList
+                .stream()
+                .map(activityDO -> {
+                    ActivityDTO activityDTO = new ActivityDTO();
+                    activityDTO.setActivityId(activityDO.getId());
+                    activityDTO.setActivityName(activityDO.getActivityName());
+                    activityDTO.setDescription(activityDO.getDescription());
+                    activityDTO.setStatus(ActivityStatusEnum.forName(activityDO.getStatus()));
+                    return activityDTO;
+                }).collect(Collectors.toList());
+
+        pageListDTO.setRecords(activityDTOList);
+        return pageListDTO;
     }
 
     /**
@@ -222,7 +253,7 @@ public class ActivityServiceImpl implements ActivityService {
         return detailDTO;
     }
 
-    private void checkActivityParam(CreateActivityParam param) {
+    private Map<Long, UserDO> checkActivityParam(CreateActivityParam param) {
         if (null == param
                 || !StringUtils.hasText(param.getActivityName())
                 || !StringUtils.hasText(param.getDescription())
@@ -232,7 +263,7 @@ public class ActivityServiceImpl implements ActivityService {
         }
 
         if (param.getActivityUserList().stream()
-                .anyMatch(user -> user == null || user.getUsreId() == null)) {
+                .anyMatch(user -> user == null || user.getUsreId() == null || !StringUtils.hasText(user.getUserName()))) {
             throw new ServiceException(ServiceErrorCodeConstants.ACTIVITY_USER_ERROR);
         }
 
@@ -253,12 +284,14 @@ public class ActivityServiceImpl implements ActivityService {
                 .distinct()
                 .collect(Collectors.toList());
 
-        List<Long> selectedUserIds = userMapper.selectByIds(activityUserIds);
-        if (CollectionUtils.isEmpty(selectedUserIds)) {
+        List<UserDO> selectedUserList = userMapper.selectBatchIds(activityUserIds);
+        if (CollectionUtils.isEmpty(selectedUserList)) {
             throw new ServiceException(ServiceErrorCodeConstants.ACTIVITY_USER_ERROR);
         }
+        Map<Long, UserDO> selectedUserMap = selectedUserList.stream()
+                .collect(Collectors.toMap(UserDO::getId, Function.identity()));
         for(Long activityUserId : activityUserIds){
-            if(!selectedUserIds.contains(activityUserId)){
+            if(!selectedUserMap.containsKey(activityUserId)){
                 throw new ServiceException(ServiceErrorCodeConstants.ACTIVITY_USER_ERROR);
             }
         }
@@ -297,6 +330,6 @@ public class ActivityServiceImpl implements ActivityService {
             }
         });
 
-
+        return selectedUserMap;
     }
 }
