@@ -53,6 +53,10 @@ public class GlobalExceptionHandler {
                         yield ServiceErrorCodeConstants.ACTIVITY_USER_ERROR;
                     }
                     if (fieldError.getField().startsWith("acticityPrizeList")
+                            && fieldError.getField().endsWith(".prizeAmount")) {
+                        yield ServiceErrorCodeConstants.USER_PRIZE_AMOUNT_ERROR;
+                    }
+                    if (fieldError.getField().startsWith("acticityPrizeList")
                             && fieldError.getField().endsWith(".prizeTiers")) {
                         yield ServiceErrorCodeConstants.ACTIVITY_PRIZE_TIERS_ERROR;
                     }

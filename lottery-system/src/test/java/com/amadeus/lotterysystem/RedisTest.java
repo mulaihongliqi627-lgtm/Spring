@@ -25,11 +25,11 @@ public class RedisTest {
     @Test
     void redisTest2(){
         System.out.println(redisUtil.hasKey("name"));
-        System.out.println(redisUtil.getValue("name"));
+        System.out.println(redisUtil.get("name"));
         redisUtil.delKey("name");
         redisUtil.hasKey("name");
         System.out.println("------------------");
         redisUtil.set("amadeus","kurisu",10);
-        System.out.println(redisUtil.getValue("amadeus"));
+        System.out.println(redisUtil.get("amadeus"));
     }
 }

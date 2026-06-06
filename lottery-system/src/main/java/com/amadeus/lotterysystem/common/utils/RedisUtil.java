@@ -76,7 +76,7 @@ public class RedisUtil {
      * @return
      */
 
-    public String getValue(String key){
+    public String get(String key){
         try{
             String value = stringRedisTemplate.opsForValue().get(key);
             log.info("redis中获取值成功，key={},value={}",key,value);

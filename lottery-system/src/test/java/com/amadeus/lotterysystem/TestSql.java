@@ -15,7 +15,7 @@ public class TestSql {
 
     @Test
     public void testDelById(){
-        int count = userMapper.deleteById(2061688033626349570L);
-        int count2 = userMapper.deleteById(2062046654608482305L);
+        int count = userMapper.deleteById(4);
     }
+
 }

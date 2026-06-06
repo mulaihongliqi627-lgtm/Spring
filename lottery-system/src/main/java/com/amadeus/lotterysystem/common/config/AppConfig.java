@@ -30,7 +30,8 @@ public class AppConfig implements WebMvcConfigurer {
             "/favicon.ico",
             "/user/password/login",
             "/user/register",
-            "/prize/find-list"
+            "/prize/find-list",
+            "/activity/create"
     );
 
     @Override
