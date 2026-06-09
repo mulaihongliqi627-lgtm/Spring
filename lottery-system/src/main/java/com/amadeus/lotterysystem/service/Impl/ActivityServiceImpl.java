@@ -27,6 +27,7 @@ import com.amadeus.lotterysystem.service.enums.ActivityPrizeStatusEnum;
 import com.amadeus.lotterysystem.service.enums.ActivityPrizeTiersEnum;
 import com.amadeus.lotterysystem.service.enums.ActivityStatusEnum;
 import com.amadeus.lotterysystem.service.enums.ActivityUserStatusEnum;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -153,6 +154,67 @@ public class ActivityServiceImpl implements ActivityService {
 
         pageListDTO.setRecords(activityDTOList);
         return pageListDTO;
+    }
+
+    @Override
+    public ActivityDetailDTO getActivityDetail(Long activityId) {
+        if (activityId == null) {
+            throw new ServiceException(ServiceErrorCodeConstants.CACHE_ACTIVITY_ID_IS_EMPTY);
+        }
+
+        //从redis缓存中查询活动信息
+        ActivityDetailDTO cacheDetailDTO = getActivityFromCache(activityId);
+        if (cacheDetailDTO != null) {
+            return cacheDetailDTO;
+        }
+
+        //缓存中没有就查询数据库
+        ActivityDO activityDO = activityMapper.selectById(activityId);
+        if (activityDO == null) {
+            throw new ServiceException(ServiceErrorCodeConstants.CACHE_ACTIVITY_ID_ERROR);
+        }
+
+        //活动人员表
+        List<ActivityUserDO> activityUserDOList = activityUserMapper.selectList(
+                new LambdaQueryWrapper<ActivityUserDO>()
+                        .eq(ActivityUserDO::getActivityId, activityId));
+        //活动奖品表
+        List<ActivityPrizeDO> activityPrizeDOList = activityPrizeMapper.selectList(
+                new LambdaQueryWrapper<ActivityPrizeDO>()
+                        .eq(ActivityPrizeDO::getActivityId, activityId));
+
+        if (CollectionUtils.isEmpty(activityUserDOList) || CollectionUtils.isEmpty(activityPrizeDOList)) {
+            throw new ServiceException(ServiceErrorCodeConstants.ACTIVITY_OR_PRIZE_IS_EMPTY);
+        }
+
+        List<Long> prizeIds = activityPrizeDOList.stream()
+                .map(ActivityPrizeDO::getPrizeId)
+                .distinct()
+                .collect(Collectors.toList());
+        List<PrizeDO> prizeDOList = prizeMapper.selectBatchIds(prizeIds);
+        if (CollectionUtils.isEmpty(prizeDOList)) {
+            throw new ServiceException(ServiceErrorCodeConstants.ACTIVITY_PRIZE_ERROR);
+        }
+
+        ActivityDetailDTO detailDTO = convertToActivityDetailDTO(
+                activityDO, activityUserDOList, prizeDOList, activityPrizeDOList);
+        //存放redis 中
+        cacheActivity(detailDTO);
+        return detailDTO;
+    }
+
+    @Override
+    public void cacheActivity(Long activityId) {
+        if (activityId == null) {
+            log.warn("refresh activity cache ignored, activityId is null");
+            return;
+        }
+        try {
+            redisUtil.delKey(ACTIVITY_PREFIX + activityId);
+            getActivityDetail(activityId);
+        } catch (Exception e) {
+            log.error("refresh activity cache failed, activityId={}", activityId, e);
+        }
     }
 
     /**
