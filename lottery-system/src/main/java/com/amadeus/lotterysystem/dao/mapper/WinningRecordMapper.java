@@ -1,0 +1,9 @@
+package com.amadeus.lotterysystem.dao.mapper;
+
+import com.amadeus.lotterysystem.dao.dataobject.WinningRecordDO;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Mapper;
+
+@Mapper
+public interface WinningRecordMapper extends BaseMapper<WinningRecordDO> {
+}

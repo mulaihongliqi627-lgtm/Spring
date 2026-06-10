@@ -2,11 +2,17 @@ package com.amadeus.lotterysystem.service.Impl;
 
 import com.amadeus.lotterysystem.controller.param.DrawPrizeParam;
 import com.amadeus.lotterysystem.service.DrawPrizeService;
+import com.amadeus.lotterysystem.service.activitystatus.ActivityStatusManager;
+import com.amadeus.lotterysystem.service.dto.ConvertActivityStatusDTO;
+import com.amadeus.lotterysystem.service.enums.ActivityPrizeStatusEnum;
+import com.amadeus.lotterysystem.service.enums.ActivityStatusEnum;
+import com.amadeus.lotterysystem.service.enums.ActivityUserStatusEnum;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -17,6 +23,10 @@ class DrawPrizeServiceImplTest {
 
     @Autowired
     private DrawPrizeService drawPrizeService;
+
+
+    @Autowired
+    private ActivityStatusManager activityStatusManager;
 
     @Test
     public void drawPrize() {
@@ -32,6 +42,21 @@ class DrawPrizeServiceImplTest {
         winnerList.add(winner);
         param.setWinnerList(winnerList);
         drawPrizeService.drawPrize(param);
+
+    }
+
+
+    @Test
+    public void testConvert(){
+        ConvertActivityStatusDTO convertActivityStatusDTO = new ConvertActivityStatusDTO();
+        convertActivityStatusDTO.setActivityId(24L);
+        convertActivityStatusDTO.setTargetActivityStatus(ActivityStatusEnum.COMPLETED);
+        convertActivityStatusDTO.setPrizeId(18L);
+        convertActivityStatusDTO.setTargetPrizeStatus(ActivityPrizeStatusEnum.COMPLETED);
+        List<Long> userIds = Arrays.asList(1L);
+        convertActivityStatusDTO.setUserIds(userIds);
+        convertActivityStatusDTO.setTargetUserStatus(ActivityUserStatusEnum.COMPLETED);
+        activityStatusManager.handlerEvent(convertActivityStatusDTO);
 
     }
 
