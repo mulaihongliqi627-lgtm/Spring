@@ -16,6 +16,7 @@ import com.amadeus.lotterysystem.dao.mapper.WinningRecordMapper;
 import com.amadeus.lotterysystem.service.WinningRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
@@ -42,6 +43,7 @@ public class WinningRecordServiceImpl implements WinningRecordService {
     private WinningRecordMapper winningRecordMapper;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void saveWinningRecords(DrawPrizeParam param) {
         ActivityDO activityDO = activityMapper.selectById(param.getActivityId());
         ActivityPrizeDO activityPrizeDO = activityPrizeMapper.selectByAPId(param.getActivityId(), param.getPrizeId());
@@ -77,5 +79,16 @@ public class WinningRecordServiceImpl implements WinningRecordService {
             recordDO.setWinningTime(param.getWinningTime());
             winningRecordMapper.insert(recordDO);
         }
+    }
+
+    @Override
+    public boolean hasWinningRecords(Long activityId, Long prizeId) {
+        return winningRecordMapper.countByAPId(activityId, prizeId) > 0;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int deleteWinningRecords(Long activityId, Long prizeId) {
+        return winningRecordMapper.deleteByAPId(activityId, prizeId);
     }
 }

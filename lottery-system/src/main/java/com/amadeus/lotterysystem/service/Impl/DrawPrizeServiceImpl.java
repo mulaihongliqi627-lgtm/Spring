@@ -50,9 +50,6 @@ public class DrawPrizeServiceImpl implements DrawPrizeService {
         // 发消息
         rabbitTemplate.convertAndSend(EXCHANGE_NAME, ROUTING, map);
         log.info("发送消息内容：{}", messageData);
-
-
-
     }
 
     @Override
