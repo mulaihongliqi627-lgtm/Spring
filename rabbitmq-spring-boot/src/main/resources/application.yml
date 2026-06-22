@@ -1,9 +1,0 @@
-spring:
-  application:
-    name: rabbitmq-spring-boot
-  rabbitmq:
-    host: 47.116.96.217
-    port: 5672
-    username: admin
-    password: 123456
-    virtual-host: /

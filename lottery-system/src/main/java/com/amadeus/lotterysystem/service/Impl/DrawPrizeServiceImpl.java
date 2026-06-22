@@ -11,7 +11,6 @@ import com.amadeus.lotterysystem.dao.mapper.ActivityPrizeMapper;
 import com.amadeus.lotterysystem.service.DrawPrizeService;
 import com.amadeus.lotterysystem.service.enums.ActivityPrizeStatusEnum;
 import com.amadeus.lotterysystem.service.enums.ActivityStatusEnum;
-import generator.service.ActivityPrizeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;

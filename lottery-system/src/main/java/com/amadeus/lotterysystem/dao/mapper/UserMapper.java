@@ -5,7 +5,6 @@ import com.amadeus.lotterysystem.dao.dataobject.Encrypt;
 import com.amadeus.lotterysystem.dao.dataobject.UserDO;
 import com.amadeus.lotterysystem.dao.handler.EncryptTypeHandler;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.sun.source.doctree.SeeTree;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;
@@ -90,5 +89,5 @@ public interface UserMapper extends BaseMapper<UserDO> {
             "#{id}" +
             "</foreach>" +
             "</script>")
-    List<Long> selectByIds(@Param("userIds") List<Long> userIds);
+    List<Long> selectExistingIds(@Param("userIds") List<Long> userIds);
 }

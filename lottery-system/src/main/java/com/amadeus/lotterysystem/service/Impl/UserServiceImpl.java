@@ -201,8 +201,6 @@ public class UserServiceImpl implements UserService {
     private boolean checkPhoneNumberUsed(@NotBlank(message = "电话不能为空！") String phoneNumber) {
         Encrypt encryptPhone = new Encrypt(phoneNumber);
         long count = userMapper.countByPhoneNumber(encryptPhone);
-
-        System.out.println("手机号 :" + phoneNumber);
         return count > 0;
     }
 
@@ -214,8 +212,6 @@ public class UserServiceImpl implements UserService {
 
     private boolean checkMailUsed(@NotBlank(message = "邮箱不能为空！") String mail) {
         long count = userMapper.countByEmailLong(mail);
-
-        System.out.println("邮箱 :" + mail);
         return count > 0;
     }
 }
