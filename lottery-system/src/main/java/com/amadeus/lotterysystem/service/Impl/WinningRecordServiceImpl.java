@@ -14,8 +14,10 @@ import com.amadeus.lotterysystem.dao.mapper.PrizeMapper;
 import com.amadeus.lotterysystem.dao.mapper.UserMapper;
 import com.amadeus.lotterysystem.dao.mapper.WinningRecordMapper;
 import com.amadeus.lotterysystem.service.WinningRecordService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
@@ -42,6 +44,7 @@ public class WinningRecordServiceImpl implements WinningRecordService {
     private WinningRecordMapper winningRecordMapper;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void saveWinningRecords(DrawPrizeParam param) {
         ActivityDO activityDO = activityMapper.selectById(param.getActivityId());
         ActivityPrizeDO activityPrizeDO = activityPrizeMapper.selectByAPId(param.getActivityId(), param.getPrizeId());
@@ -49,13 +52,17 @@ public class WinningRecordServiceImpl implements WinningRecordService {
         if (activityDO == null || activityPrizeDO == null || prizeDO == null) {
             throw new ServiceException(ServiceErrorCodeConstants.ACTIVITY_OR_PRIZE_IS_EMPTY);
         }
+        if (hasWinningRecords(param.getActivityId(), param.getPrizeId())) {
+            return;
+        }
 
         List<Long> winnerIds = param.getWinnerList()
                 .stream()
                 .map(DrawPrizeParam.Winner::getUserId)
                 .distinct()
                 .collect(Collectors.toList());
-        List<UserDO> winnerDOList = userMapper.selectBatchIds(winnerIds);
+        List<UserDO> winnerDOList = userMapper.selectList(new LambdaQueryWrapper<UserDO>()
+                .in(UserDO::getId, winnerIds));
         if (CollectionUtils.isEmpty(winnerDOList) || winnerDOList.size() != winnerIds.size()) {
             throw new ServiceException(ServiceErrorCodeConstants.ACTIVITY_USER_ERROR);
         }
@@ -77,5 +84,28 @@ public class WinningRecordServiceImpl implements WinningRecordService {
             recordDO.setWinningTime(param.getWinningTime());
             winningRecordMapper.insert(recordDO);
         }
+    }
+
+    @Override
+    public boolean hasWinningRecords(Long activityId, Long prizeId) {
+        return winningRecordMapper.countByAPId(activityId, prizeId) > 0;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int deleteWinningRecords(Long activityId, Long prizeId) {
+        return winningRecordMapper.deleteByAPId(activityId, prizeId);
+    }
+
+    @Override
+    public List<WinningRecordDO> findWinningRecords(Long activityId, Long prizeId) {
+        LambdaQueryWrapper<WinningRecordDO> queryWrapper = new LambdaQueryWrapper<WinningRecordDO>()
+                .eq(WinningRecordDO::getActivityId, activityId)
+                .orderByAsc(WinningRecordDO::getWinningTime)
+                .orderByAsc(WinningRecordDO::getId);
+        if (prizeId != null) {
+            queryWrapper.eq(WinningRecordDO::getPrizeId, prizeId);
+        }
+        return winningRecordMapper.selectList(queryWrapper);
     }
 }

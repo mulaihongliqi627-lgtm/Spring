@@ -31,14 +31,14 @@ class DrawPrizeServiceImplTest {
     @Test
     public void drawPrize() {
         DrawPrizeParam param = new DrawPrizeParam();
-        param.setActivityId(1L);
-        param.setPrizeId(1L);
+        param.setActivityId(24L);
+        param.setPrizeId(19L);
         param.setPrizeTiers("FIRST_PRIZE");
         param.setWinningTime(new Date());
         List<DrawPrizeParam.Winner> winnerList = new ArrayList<>();
         DrawPrizeParam.Winner winner = new DrawPrizeParam.Winner();
-        winner.setUserId(1L);
-        winner.setUserName("张三");
+        winner.setUserId(2L);
+        winner.setUserName("doge");
         winnerList.add(winner);
         param.setWinnerList(winnerList);
         drawPrizeService.drawPrize(param);

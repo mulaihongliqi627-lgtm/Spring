@@ -11,7 +11,6 @@ import com.amadeus.lotterysystem.dao.mapper.ActivityPrizeMapper;
 import com.amadeus.lotterysystem.service.DrawPrizeService;
 import com.amadeus.lotterysystem.service.enums.ActivityPrizeStatusEnum;
 import com.amadeus.lotterysystem.service.enums.ActivityStatusEnum;
-import generator.service.ActivityPrizeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,9 +49,6 @@ public class DrawPrizeServiceImpl implements DrawPrizeService {
         // 发消息
         rabbitTemplate.convertAndSend(EXCHANGE_NAME, ROUTING, map);
         log.info("发送消息内容：{}", messageData);
-
-
-
     }
 
     @Override

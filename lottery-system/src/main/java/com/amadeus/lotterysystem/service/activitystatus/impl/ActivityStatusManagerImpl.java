@@ -9,6 +9,8 @@ import com.amadeus.lotterysystem.service.dto.ConvertActivityStatusDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Comparator;
@@ -38,18 +40,19 @@ public class ActivityStatusManagerImpl implements ActivityStatusManager {
             throw new ServiceException(ServiceErrorCodeConstants.ACTIVITY_STATUS_CONVERT_ERROR);
         }
         if (CollectionUtils.isEmpty(operatorList)) {
-            log.error("activity status operator list is empty");
+            log.error("活动状态operator列表为空!");
             throw new ServiceException(ServiceErrorCodeConstants.ACTIVITY_STATUS_CONVERT_ERROR);
         }
 
         boolean updated = false;
         for (AbstractActivityOperator operator : operatorList) {
+            //如果不需要回滚，则跳过
             if (!Boolean.TRUE.equals(operator.needConvert(convertActivityStatusDTO))) {
                 continue;
             }
             Boolean success = operator.convert(convertActivityStatusDTO);
             if (!Boolean.TRUE.equals(success)) {
-                log.error("activity status convert failed, operator={}, dto={}",
+                log.error("活动状态回滚失败, operator={}, dto={}",
                         operator.getClass().getSimpleName(), convertActivityStatusDTO);
                 throw new ServiceException(ServiceErrorCodeConstants.ACTIVITY_STATUS_CONVERT_ERROR);
             }
@@ -57,7 +60,21 @@ public class ActivityStatusManagerImpl implements ActivityStatusManager {
         }
 
         if (updated) {
-            activityService.cacheActivity(convertActivityStatusDTO.getActivityId());
+            refreshActivityCacheAfterCommit(convertActivityStatusDTO.getActivityId());
         }
+    }
+
+    private void refreshActivityCacheAfterCommit(Long activityId) {
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            activityService.cacheActivity(activityId);
+            return;
+        }
+
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                activityService.cacheActivity(activityId);
+            }
+        });
     }
 }
