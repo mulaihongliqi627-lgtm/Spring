@@ -1,0 +1,22 @@
+server:
+  port: 8080 # 单体后端默认端口，可按需调整
+
+spring:
+  application:
+    name: easy-chat2excel
+  servlet:
+    multipart:
+      max-file-size: 100MB # 上传文件大小上限
+      max-request-size: 100MB
+  ai:
+    dashscope:
+      api-key: sk-ws-H.EDDHPRR.H3Ng.MEYCIQCftqD-Dap-_TQHcbmlZWlFRwrK0yMqJ8uevsSjVRtTrgIhAKAkbI4EAlZ7kqzGoOWbjwW9BaybuXvjL7BZpFPtpGxI # 使用个人的秘钥Key
+      chat:
+        options:
+          model: qwen-plus # 通义千问模型，可替换为 qwen-max 等
+          temperature: 0.3 # 输出随机性
+
+# 自定义日志配置
+logging:
+  pattern:
+    console: "%clr(%d{HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){cyan} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx"
