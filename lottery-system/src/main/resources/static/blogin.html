@@ -210,7 +210,7 @@
         .login-actions {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: flex-start;
             gap: 12px;
             margin: 4px 0 22px;
             color: #64748b;
@@ -383,7 +383,6 @@
                     <input type="checkbox" id="rememberLogin" checked>
                     <span>记住登录信息</span>
                 </label>
-                <a href="register.html?admin=true">注册管理员账号</a>
             </div>
 
             <button type="submit" class="btn login-btn" id="submitBtn">登录</button>
@@ -392,7 +391,7 @@
         </form>
 
         <div class="register-link">
-            还没有账号，去 <a href="register.html?admin=true">注册</a>
+            还没有普通用户账号，去 <a href="register.html">注册</a>
         </div>
     </div>
 </div>

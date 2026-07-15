@@ -1,5 +1,6 @@
 package com.amadeus.lotterysystem.common.config;
 
+import com.amadeus.lotterysystem.common.interceptor.AdminInterceptor;
 import com.amadeus.lotterysystem.common.interceptor.LoginInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +17,9 @@ public class AppConfig implements WebMvcConfigurer {
 
     @Autowired
     private LoginInterceptor loginInterceptor;
+
+    @Autowired
+    private AdminInterceptor adminInterceptor;
 
 
     //放行的url
@@ -38,7 +42,11 @@ public class AppConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry){
         registry.addInterceptor(loginInterceptor)
                 .addPathPatterns("/**")
-                .excludePathPatterns(excludes);
+                .excludePathPatterns(excludes)
+                .order(0);
+        registry.addInterceptor(adminInterceptor)
+                .addPathPatterns("/user/admin/**")
+                .order(1);
     }
 
 }

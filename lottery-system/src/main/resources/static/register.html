@@ -132,7 +132,7 @@
 <body>
 <main class="page">
     <section class="register-panel">
-        <h1>用户注册</h1>
+        <h1 id="registerTitle">普通用户注册</h1>
 
         <form id="registerForm" novalidate>
             <div class="form-group">
@@ -153,7 +153,7 @@
                 <div class="error-text" data-error-for="phoneNumber"></div>
             </div>
 
-            <div class="form-group">
+            <div class="form-group" id="identityGroup" hidden>
                 <label for="identity">身份</label>
                 <select id="identity" name="identity">
                     <option value="NORMAL">普通用户</option>
@@ -182,12 +182,20 @@
     var submitBtn = document.getElementById('submitBtn');
     var message = document.getElementById('message');
     var identity = document.getElementById('identity');
+    var identityGroup = document.getElementById('identityGroup');
     var password = document.getElementById('password');
     var passwordHint = document.getElementById('passwordHint');
+    var registerTitle = document.getElementById('registerTitle');
 
     var params = new URLSearchParams(window.location.search);
-    if (params.get('admin') === 'true') {
-        identity.value = 'ADMIN';
+    var adminMode = params.get('jumpList') === 'true';
+
+    if (adminMode) {
+        identityGroup.hidden = false;
+        registerTitle.textContent = '后台注册用户';
+        document.title = '后台注册用户';
+    } else {
+        identity.value = 'NORMAL';
     }
 
     identity.addEventListener('change', updatePasswordHint);
@@ -219,15 +227,35 @@
         submitBtn.disabled = true;
         submitBtn.textContent = '注册中...';
 
-        fetch('/user/register', {
+        var registerUrl = adminMode ? '/user/admin/register' : '/user/register';
+        var requestHeaders = {
+            'Content-Type': 'application/json'
+        };
+
+        if (adminMode) {
+            requestHeaders.user_token = normalizeToken(
+                localStorage.getItem('user_token') || localStorage.getItem('token')
+            );
+        }
+
+        fetch(registerUrl, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: requestHeaders,
             body: JSON.stringify(payload)
         })
             .then(function (response) {
-                return response.text();
+                return response.text().then(function (text) {
+                    if (response.status === 401) {
+                        throw new Error('登录已过期，请重新登录管理员账号');
+                    }
+                    if (response.status === 403) {
+                        throw new Error('当前账号没有创建用户的管理员权限');
+                    }
+                    if (!response.ok && !text) {
+                        throw new Error('注册失败，请稍后重试');
+                    }
+                    return text;
+                });
             })
             .then(function (text) {
                 var result = parseRegisterResult(text);
@@ -241,7 +269,7 @@
                 }
 
                 form.reset();
-                identity.value = payload.identity;
+                identity.value = adminMode ? payload.identity : 'NORMAL';
                 updatePasswordHint();
                 setMessage('success', '注册成功，用户ID：' + (result.userId || '已生成'));
             })
@@ -256,6 +284,10 @@
 
     function getValue(id) {
         return document.getElementById(id).value.trim();
+    }
+
+    function normalizeToken(token) {
+        return token ? token.trim().replace(/^"+|"+$/g, '') : '';
     }
 
     function updatePasswordHint() {

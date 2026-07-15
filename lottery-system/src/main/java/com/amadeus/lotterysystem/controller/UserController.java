@@ -41,7 +41,17 @@ public class UserController {
     @PostMapping("/register")
     public CommonResult<UserRegisterResult> userRegister(
             @Validated @RequestBody UserRegisterParam param){
+        param.setIdentity(UserIdentityEnum.NORMAL.name());
+        return register(param);
+    }
 
+    @PostMapping("/admin/register")
+    public CommonResult<UserRegisterResult> userRegisterByAdmin(
+            @Validated @RequestBody UserRegisterParam param){
+        return register(param);
+    }
+
+    private CommonResult<UserRegisterResult> register(UserRegisterParam param) {
         log.info("用户注册请求 , parm {}", JacksonUtil.writeValueAsString( param));
         UserRegisterDTO userRegisterDTO = userService.register(param);
         return CommonResult.success(convertToUserRegisterResult(userRegisterDTO));

@@ -13,6 +13,8 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Slf4j
 public class LoginInterceptor implements HandlerInterceptor {
 
+    public static final String LOGIN_CLAIMS_ATTRIBUTE = LoginInterceptor.class.getName() + ".claims";
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         //从header 中获取token
@@ -26,14 +28,17 @@ public class LoginInterceptor implements HandlerInterceptor {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         }
+        request.setAttribute(LOGIN_CLAIMS_ATTRIBUTE, claims);
         log.info("token解析成功");
         return true;
     }
 
+    //规范化,清洗 JWT Token 字符串
     private String normalizeToken(String token) {
         if (token == null) {
             return null;
         }
+        //使用正则表达式去除 Token 首尾的引号（`"`）
         return token.trim().replaceAll("^\"+|\"+$", "");
     }
 }
